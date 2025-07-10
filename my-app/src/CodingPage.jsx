@@ -12,11 +12,13 @@ export default function CodingPage() {
         </div>
       </nav>
 
-      <div className="container" style={{ marginTop: '30rem' }}>
+      <div className="container" style={{ marginTop: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <h1>Coding Templates</h1>
-        {[...Array(10)].map((_, idx) => (
-          <div className="card" key={idx}>Dialog Box {idx + 1}</div>
-        ))}
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
+          {[...Array(10)].map((_, idx) => (
+            <div className="card" key={idx} style={{ width: '80%', margin: '0 auto' }}>Dialog Box {idx + 1}</div>
+          ))}
+        </div>
       </div>
 
       <footer style={{ textAlign: "center", marginBottom: "2rem", color: "#64748b" }}>
