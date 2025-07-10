@@ -1,56 +1,41 @@
-import { useState } from "react";
-import { useRef } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./prompt-refiner.css";
 
 export default function PromptRefiner() {
-  // Refs for scrolling
   const homeRef = useRef(null);
   const aboutRef = useRef(null);
   const contactRef = useRef(null);
   const navigate = typeof useNavigate === 'function' ? useNavigate() : () => {};
-  // Scroll to section
+
   const scrollToSection = (ref) => {
     if (ref && ref.current) {
       ref.current.scrollIntoView({ behavior: "smooth" });
     }
   };
+
   const [userPrompt, setUserPrompt] = useState("");
   const [missingElements, setMissingElements] = useState([]);
   const [refinedPrompt, setRefinedPrompt] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showDialog, setShowDialog] = useState(false); // <-- ADD THIS LINE
-  const [additionalDetails, setAdditionalDetails] = useState(""); // <-- NEW STATE
+  const [showDialog, setShowDialog] = useState(false);
+  const [additionalDetails, setAdditionalDetails] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // Refine prompt, optionally with a new prompt value
   const handleRefinePrompt = async (prompt = userPrompt) => {
     setLoading(true);
     setMissingElements([]);
     setRefinedPrompt("");
     setShowDialog(false);
 
-    // Simulate API
     setTimeout(() => {
       setMissingElements(["Add more details", "Specify format"]);
       setRefinedPrompt("This is a refined version of your prompt.");
       setLoading(false);
       setShowDialog(true);
     }, 1000);
-
-    // Uncomment for real API
-    // const response = await fetch("/api/refine-prompt", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ prompt }),
-    // });
-    // const data = await response.json();
-    // setMissingElements(data.missingElements);
-    // setRefinedPrompt(data.refinedPrompt);
-    // setLoading(false);
-    // setShowDialog(true);
   };
 
-  // Allow user to add more details and re-refine
   const handleAddDetails = () => {
     const combinedPrompt = userPrompt + "\n" + additionalDetails;
     setUserPrompt(combinedPrompt);
@@ -61,19 +46,42 @@ export default function PromptRefiner() {
 
   return (
     <>
-      {/* Nav Bar */}
       <nav className="navbar">
         <div className="navbar-content">
-          <div className="navbar-brand">PromptRefiner</div>
+          <div className="navbar-brand">PromptBuddy</div>
           <div className="navbar-links">
             <button className="nav-btn home" onClick={() => scrollToSection(homeRef)}>Home</button>
             <button className="nav-btn about" onClick={() => scrollToSection(aboutRef)}>About</button>
             <button className="nav-btn contact" onClick={() => scrollToSection(contactRef)}>Contact</button>
-            <button className="nav-btn templates" onClick={() => navigate && navigate('/templates')}>Templates</button>
+
+            <div
+              className={`dropdown ${dropdownOpen ? "open" : ""}`}
+              onMouseLeave={() => setDropdownOpen(false)}
+            >
+              <button
+                className="nav-btn templates"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              >
+                Templates
+              </button>
+              <div className="dropdown-menu">
+                <button onClick={() => navigate("/coding")}>Coding</button>
+                <button onClick={() => navigate("/web-search")}>Web Search</button>
+                <button onClick={() => navigate("/research")}>Research</button>
+                <button onClick={() => navigate("/ai-teaching")}>AI Teaching (School)</button>
+                <button onClick={() => navigate("/summary-generator")}>Summary Generator</button>
+              </div>
+            </div>
           </div>
         </div>
       </nav>
-      {/* Background Video */}
+
+      <section className="hero">
+        <h1>Craft Flawless AI Prompts</h1>
+        <p>PromptBuddy helps you turn vague ideas into detailed, high-performing prompts for AI tools.</p>
+        <button className="hero-btn" onClick={() => scrollToSection(homeRef)}>Try It Now</button>
+      </section>
+
       <video
         id="background-video"
         autoPlay
@@ -85,7 +93,6 @@ export default function PromptRefiner() {
         Your browser does not support the video tag.
       </video>
 
-      {/* Dialog Box for AI Answer */}
       {showDialog && refinedPrompt && (
         <div className="dialog-backdrop">
           <div className="dialog-box">
@@ -96,7 +103,6 @@ export default function PromptRefiner() {
         </div>
       )}
 
-      {/* Dialog Box for Missing Elements + Add Details */}
       {showDialog && missingElements.length > 0 && (
         <div className="dialog-backdrop">
           <div className="dialog-box">
@@ -118,15 +124,9 @@ export default function PromptRefiner() {
           </div>
         </div>
       )}
-        {/* Background Overlay
-        <div className="background-overlay"></div> */}
-        
 
-
-      {/* Main UI Container */}
-      <div className="container" ref={homeRef}>
-        <h1>AI Prompt Refiner</h1>
-
+      <div className="container" ref={homeRef} style={{ marginTop: '40rem', marginBottom: '4rem' }}>
+        <h1>Prompt Refiner</h1>
         <textarea
           className="input"
           rows={6}
@@ -134,9 +134,8 @@ export default function PromptRefiner() {
           onChange={(e) => setUserPrompt(e.target.value)}
           placeholder="Enter your prompt..."
         />
-
-        <button onClick={handleRefinePrompt} disabled={loading}>
-          {loading ? "Refining..." : "Refine Prompt"}
+        <button onClick={handleRefinePrompt}>
+          {loading ? <span className="spinner"></span> : "Refine Prompt"}
         </button>
 
         {missingElements.length > 0 && (
@@ -158,14 +157,12 @@ export default function PromptRefiner() {
         )}
       </div>
 
-      {/* About Section */}
-      <div className="container" ref={aboutRef} style={{ marginTop: 40 }}>
+      <div className="container" ref={aboutRef} style={{ marginTop: '5rem', marginBottom: '4rem' }}>
         <h2>About</h2>
-        <p>This tool helps you refine your AI prompts by suggesting missing elements and allowing you to add more details for better results.</p>
+        <p>PromptBuddy helps refine your AI prompts by detecting missing elements and allowing additional input for superior results.</p>
       </div>
 
-      {/* Contact Section */}
-      <div className="container" ref={contactRef} style={{ marginTop: 40, marginBottom: 40 }}>
+      <div className="container" ref={contactRef} style={{ marginTop: '5rem', marginBottom: '5rem' }}>
         <h2>Contact</h2>
         <p>For support or feedback, contact us at <a href="mailto:support@example.com">support@example.com</a>.</p>
       </div>
