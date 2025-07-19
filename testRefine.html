@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Prompt Refine Tester</title>
+</head>
+<body>
+  <h1>Refine Prompt API Tester</h1>
+  <textarea id="prompt" rows="5" cols="60" placeholder="Enter your prompt here..."></textarea>
+  <br />
+  <button onclick="refinePrompt()">Refine</button>
+  <pre id="output"></pre>
+
+  <script>
+    async function refinePrompt() {
+      const prompt = document.getElementById("prompt").value;
+
+      const res = await fetch("http://localhost:5000/api/refine", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt })
+      });
+
+      const data = await res.json();
+      document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>

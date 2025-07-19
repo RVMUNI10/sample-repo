@@ -22,19 +22,67 @@ export default function PromptRefiner() {
   const [additionalDetails, setAdditionalDetails] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const handleRefinePrompt = async (prompt = userPrompt) => {
-    setLoading(true);
-    setMissingElements([]);
-    setRefinedPrompt("");
-    setShowDialog(false);
+//  const handleRefinePrompt = async () => {
+//   setLoading(true);
+//   setMissingElements([]);
+//   setRefinedPrompt("");
+//   setShowDialog(false);
 
-    setTimeout(() => {
-      setMissingElements(["Add more details", "Specify format"]);
-      setRefinedPrompt("This is a refined version of your prompt.");
-      setLoading(false);
+//   try {
+//     const response = await fetch("http://localhost:5000/refine", {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({ prompt: userPrompt }),
+//     });
+
+//     const data = await response.json();
+
+//     // Simulate detection of missing elements (optional, or can be returned from backend)
+//     setMissingElements(["Add more details", "Specify format"]);
+
+//     setRefinedPrompt(data.refined);
+//     setShowDialog(true);
+//   } catch (error) {
+//     console.error("Error refining prompt:", error);
+//     setRefinedPrompt("Something went wrong. Please try again later.");
+//     setShowDialog(true);
+//   } finally {
+//     setLoading(false);
+//   }
+// };
+
+const handleRefinePrompt = async () => {
+  setLoading(true);
+  setSuggestions("");
+  setRefinedPrompt("");
+
+  try {
+    const response = await fetch("http://localhost:5000/api/refine", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ prompt: userPrompt }) // or { prompt: input } based on your state
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setSuggestions(data.suggestions);
+      setRefinedPrompt(data.refined);
       setShowDialog(true);
-    }, 1000);
-  };
+    } else {
+      console.error("Backend error:", data.error);
+      alert("Something went wrong! Please try again.");
+    }
+  } catch (error) {
+    console.error("Fetch error:", error);
+    alert("Failed to connect to backend.");
+  }
+
+  setLoading(false);
+};
+
 
   const handleAddDetails = () => {
     const combinedPrompt = userPrompt + "\n" + additionalDetails;
